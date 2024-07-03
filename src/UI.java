@@ -3,7 +3,9 @@ import java.awt.*;
 import java.awt.event.*;;
 
 public class UI extends JPanel {
-    static long WP=0L,WN=0L,WB=0L,WR=0L,WQ=0L,WK=0L,BP=0L,BN=0L,BB=0L,BR=0L,BQ=0L,BK=0L;
+    static long WP=0L,WN=0L,WB=0L,WR=0L,WQ=0L,WK=0L,BP=0L,BN=0L,BB=0L,BR=0L,BQ=0L,BK=0L, EP=0L;
+    static boolean CWK=true,CWQ=true,CBK=true,CBQ=true, WhiteToMove = true, UniversalCastleWK=true,UniversalCastleWQ=true,
+    UniversalCastleBK=true,UniversalCastleBQ=true;
     static long UniversalWP=0L,UniversalWN=0L,UniversalWB=0L,UniversalWR=0L,UniversalWQ=0L,UniversalWK=0L,UniversalBP=0L,UniversalBN=0L,UniversalBB=0L,UniversalBR=0L,UniversalBQ=0L, UniversalBK=0L;
     static int rating=0;
     static int border=10;
@@ -18,7 +20,19 @@ public class UI extends JPanel {
         frame.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-frame.getWidth())/2,
         (Toolkit.getDefaultToolkit().getScreenSize().height-frame.getHeight())/2);
         frame.setVisible(true);
-        newGame();
+        BoardGenerator.importFEN("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ");
+        
+        Perft.perftRoot(WP,WN,WB,WR,WQ,WK,BP,BN,BB,BR,BQ,BK,EP,CWK,CWQ,CBK,CBQ,WhiteToMove,0);
+        if (Perft.perftTotalMoveCounter==0) {
+            if (WhiteToMove) {
+                Perft.perftTotalMoveCounter=Moves.possibleWhiteMoves(WP,WN,WB,WR,WQ,WK,BP,BN,BB,BR,BQ,BK,EP,CWK,CWQ,CBK,CBQ).length()/4;
+            } else {
+                Perft.perftTotalMoveCounter=Moves.possibleBlackMoves(WP,WN,WB,WR,WQ,WK,BP,BN,BB,BR,BQ,BK,EP,CWK,CWQ,CBK,CBQ).length()/4;
+            }
+        }
+        System.out.println(Moves.possibleWhiteMoves(WP,WN,WB,WR,WQ,WK,BP,BN,BB,BR,BQ,BK,EP,CWK,CWQ,CBK,CBQ));
+        System.out.println(Moves.possibleBlackMoves(WP,WN,WB,WR,WQ,WK,BP,BN,BB,BR,BQ,BK,EP,CWK,CWQ,CBK,CBQ));
+        System.out.print("Total: "+Perft.perftTotalMoveCounter);
         frame.repaint();
     }
     @Override
@@ -103,7 +117,7 @@ public class UI extends JPanel {
         }
         Object[] options = {"Computer", "Human"};
         humanColor = JOptionPane.showOptionDialog(null, "Who should play as white?", "Computer Settings", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        Moves.possibleWhiteMoves("", WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK);
+        Moves.possibleWhiteMoves(WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EP, CWK, CWQ, CBK, CBQ);
 
     }
 }
