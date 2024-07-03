@@ -8,8 +8,8 @@ public class BoardGenerator {
             {"r","n","b","q","k","b","n","r"},
             {"p","p","p","p","p","p","p","p"},
             {" "," "," "," "," "," "," "," "},
-            {" "," "," "," "," ","p"," "," "},
-            {" ","p"," "," ","B"," "," "," "},
+            {" "," "," "," "," "," "," "," "},
+            {" "," "," "," "," "," "," "," "},
             {" "," "," "," "," "," "," "," "},
             {"P","P","P","P","P","P","P","P"},
             {"R","N","B","Q","K","B","N","R"}
@@ -87,6 +87,88 @@ public class BoardGenerator {
         board[0][counter] = "r";
         board[7][counter] = "R";
         arrayToBitboards(board);
+    }
+
+    public static void importFEN(String FEN){
+        UI.WP=UI.WN=UI.WB=UI.WR=UI.WQ=UI.WK=UI.BP=UI.BN=UI.BB=UI.BR=UI.BQ=UI.BK=0;
+        UI.CWK = UI.CWQ = UI.CBK = UI.CBQ = false ;
+        int charI = 0;
+            int boardI = 0;
+        int boardIndex = 0;
+        while (FEN.charAt(charI) != ' ')
+        {
+            switch (FEN.charAt(charI++))
+            {
+            case 'P': UI.WP |= (1L << boardIndex++);
+                break;
+            case 'p': UI.BP |= (1L << boardIndex++);
+                break;
+            case 'N': UI.WN |= (1L << boardIndex++);
+                break;
+            case 'n': UI.BN |= (1L << boardIndex++);
+                break;
+            case 'B': UI.WB |= (1L << boardIndex++);
+                break;
+            case 'b': UI.BB |= (1L << boardIndex++);
+                break;
+            case 'R': UI.WR |= (1L << boardIndex++);
+                break;
+            case 'r': UI.BR |= (1L << boardIndex++);
+                break;
+            case 'Q': UI.WQ |= (1L << boardIndex++);
+                break;
+            case 'q': UI.BQ |= (1L << boardIndex++);
+                break;
+            case 'K': UI.WK |= (1L << boardIndex++);
+                break;
+            case 'k': UI.BK |= (1L << boardIndex++);
+                break;
+            case '/':
+                break;
+            case '1': boardIndex++;
+                break;
+            case '2': boardIndex += 2;
+                break;
+            case '3': boardIndex += 3;
+                break;
+            case '4': boardIndex += 4;
+                break;
+            case '5': boardIndex += 5;
+                break;
+            case '6': boardIndex += 6;
+                break;
+            case '7': boardIndex += 7;
+                break;
+            case '8': boardIndex += 8;
+                break;
+            default:
+                break;
+            }
+        }
+        UI.WhiteToMove = (FEN.charAt(++charI) == 'w');
+        charI += 2;
+        while (FEN.charAt(charI) != ' ')
+        {
+            switch (FEN.charAt(charI++))
+            {
+            case '-':
+                break;
+            case 'K': UI.CWK = true;
+                break;
+            case 'Q': UI.CWQ = true;
+                break;
+            case 'k': UI.CBK = true;
+                break;
+            case 'q': UI.CBQ = true;
+                break;
+            default:
+                break;
+            }
+        }
+        if (FEN.charAt(++charI) != '-')
+        {
+            UI.EP = Moves.FileMasks8[FEN.charAt(charI++) - 'a'];
+        }
     }
 
     public static void arrayToBitboards(String[][] board){
