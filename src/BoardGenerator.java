@@ -90,62 +90,61 @@ public class BoardGenerator {
     }
 
     public static void importFEN(String FEN){
-        UI.WP=UI.WN=UI.WB=UI.WR=UI.WQ=UI.WK=UI.BP=UI.BN=UI.BB=UI.BR=UI.BQ=UI.BK=0;
-        UI.CWK = UI.CWQ = UI.CBK = UI.CBQ = false ;
+        Operator.WP=Operator.WN=Operator.WB=Operator.WR=Operator.WQ=Operator.WK=Operator.BP=Operator.BN=Operator.BB=Operator.BR=Operator.BQ=Operator.BK=0;
+        Operator.CWK = Operator.CWQ = Operator.CBK = Operator.CBQ = false ;
         int charI = 0;
-            int boardI = 0;
-        int boardIndex = 0;
+        int boardI = 0;
         while (FEN.charAt(charI) != ' ')
         {
             switch (FEN.charAt(charI++))
             {
-            case 'P': UI.WP |= (1L << boardIndex++);
+            case 'P': Operator.WP |= (1L << boardI++);
                 break;
-            case 'p': UI.BP |= (1L << boardIndex++);
+            case 'p': Operator.BP |= (1L << boardI++);
                 break;
-            case 'N': UI.WN |= (1L << boardIndex++);
+            case 'N': Operator.WN |= (1L << boardI++);
                 break;
-            case 'n': UI.BN |= (1L << boardIndex++);
+            case 'n': Operator.BN |= (1L << boardI++);
                 break;
-            case 'B': UI.WB |= (1L << boardIndex++);
+            case 'B': Operator.WB |= (1L << boardI++);
                 break;
-            case 'b': UI.BB |= (1L << boardIndex++);
+            case 'b': Operator.BB |= (1L << boardI++);
                 break;
-            case 'R': UI.WR |= (1L << boardIndex++);
+            case 'R': Operator.WR |= (1L << boardI++);
                 break;
-            case 'r': UI.BR |= (1L << boardIndex++);
+            case 'r': Operator.BR |= (1L << boardI++);
                 break;
-            case 'Q': UI.WQ |= (1L << boardIndex++);
+            case 'Q': Operator.WQ |= (1L << boardI++);
                 break;
-            case 'q': UI.BQ |= (1L << boardIndex++);
+            case 'q': Operator.BQ |= (1L << boardI++);
                 break;
-            case 'K': UI.WK |= (1L << boardIndex++);
+            case 'K': Operator.WK |= (1L << boardI++);
                 break;
-            case 'k': UI.BK |= (1L << boardIndex++);
+            case 'k': Operator.BK |= (1L << boardI++);
                 break;
             case '/':
                 break;
-            case '1': boardIndex++;
+            case '1': boardI++;
                 break;
-            case '2': boardIndex += 2;
+            case '2': boardI += 2;
                 break;
-            case '3': boardIndex += 3;
+            case '3': boardI += 3;
                 break;
-            case '4': boardIndex += 4;
+            case '4': boardI += 4;
                 break;
-            case '5': boardIndex += 5;
+            case '5': boardI += 5;
                 break;
-            case '6': boardIndex += 6;
+            case '6': boardI += 6;
                 break;
-            case '7': boardIndex += 7;
+            case '7': boardI += 7;
                 break;
-            case '8': boardIndex += 8;
+            case '8': boardI += 8;
                 break;
             default:
                 break;
             }
         }
-        UI.WhiteToMove = (FEN.charAt(++charI) == 'w');
+        Operator.whiteToMove = (FEN.charAt(++charI) == 'w');
         charI += 2;
         while (FEN.charAt(charI) != ' ')
         {
@@ -153,13 +152,13 @@ public class BoardGenerator {
             {
             case '-':
                 break;
-            case 'K': UI.CWK = true;
+            case 'K': Operator.CWK = true;
                 break;
-            case 'Q': UI.CWQ = true;
+            case 'Q': Operator.CWQ = true;
                 break;
-            case 'k': UI.CBK = true;
+            case 'k': Operator.CBK = true;
                 break;
-            case 'q': UI.CBQ = true;
+            case 'q': Operator.CBQ = true;
                 break;
             default:
                 break;
@@ -167,8 +166,9 @@ public class BoardGenerator {
         }
         if (FEN.charAt(++charI) != '-')
         {
-            UI.EP = Moves.FileMasks8[FEN.charAt(charI++) - 'a'];
+            Operator.EP = Moves.FileMasks8[FEN.charAt(charI++) - 'a'];
         }
+        Operator.position = new Position(Operator.WP,Operator.WN,Operator.WB,Operator.WR,Operator.WQ,Operator.WK,Operator.BP,Operator.BN,Operator.BB,Operator.BR,Operator.BQ,Operator.BK,Operator.EP,Operator.CWK,Operator.CWQ,Operator.CBK,Operator.CBQ);
     }
 
     public static void arrayToBitboards(String[][] board){
@@ -216,14 +216,14 @@ public class BoardGenerator {
             }
             binary <<= 1;
         }
-        UI.WP=WP; UI.WN=WN; UI.WB=WB;
-        UI.WR=WR; UI.WQ=WQ; UI.WK=WK;
-        UI.BP=BP; UI.BN=BN; UI.BB=BB;
-        UI.BR=BR; UI.BQ=BQ; UI.BK=BK;
-        drawArray();
+        Operator.WP=WP; Operator.WN=WN; Operator.WB=WB;
+        Operator.WR=WR; Operator.WQ=WQ; Operator.WK=WK;
+        Operator.BP=BP; Operator.BN=BN; Operator.BB=BB;
+        Operator.BR=BR; Operator.BQ=BQ; Operator.BK=BK;
+        Operator.position = new Position(Operator.WP,Operator.WN,Operator.WB,Operator.WR,Operator.WQ,Operator.WK,Operator.BP,Operator.BN,Operator.BB,Operator.BR,Operator.BQ,Operator.BK,Operator.EP,Operator.CWK,Operator.CWQ,Operator.CBK,Operator.CBQ);
     }
 
-    private static void drawArray() {
+    public static void drawArray(long WP,long WN,long WB,long WR,long WQ,long WK,long BP,long BN,long BB,long BR,long BQ,long BK) {
         String[][] board = {
         {" "," "," "," "," "," "," "," "},
         {" "," "," "," "," "," "," "," "},
@@ -238,27 +238,27 @@ public class BoardGenerator {
         for (int i = 0; i < 64; i++) {
             if (((WP>>i)&1)==1)
                 board[i/8][i%8] = "P";
-            if (((WR>>i)&1)==1)
+            else if (((WR>>i)&1)==1)
                 board[i/8][i%8] = "R";
-            if (((WN>>i)&1)==1)
+            else if (((WN>>i)&1)==1)
                 board[i/8][i%8] = "N";
-            if (((WB>>i)&1)==1)
+            else if (((WB>>i)&1)==1)
                 board[i/8][i%8] = "B";
-            if (((WQ>>i)&1)==1)
+            else if (((WQ>>i)&1)==1)
                 board[i/8][i%8] = "Q";
-            if (((WK>>i)&1)==1)
+            else if (((WK>>i)&1)==1)
                 board[i/8][i%8] = "K";
-            if (((BP>>i)&1)==1)
+            else if (((BP>>i)&1)==1)
                 board[i/8][i%8] = "p";
-            if (((BR>>i)&1)==1)
+            else if (((BR>>i)&1)==1)
                 board[i/8][i%8] = "r";
-            if (((BN>>i)&1)==1)
+            else if (((BN>>i)&1)==1)
                 board[i/8][i%8] = "n";
-            if (((BB>>i)&1)==1)
+            else if (((BB>>i)&1)==1)
                 board[i/8][i%8] = "b";
-            if (((BQ>>i)&1)==1)
+            else if (((BQ>>i)&1)==1)
                 board[i/8][i%8] = "q";
-            if (((BK>>i)&1)==1)
+            else if (((BK>>i)&1)==1)
                 board[i/8][i%8] = "k";
         }
         printBoard(board);

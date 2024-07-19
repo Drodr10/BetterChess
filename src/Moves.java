@@ -42,34 +42,34 @@ public class Moves {
 	0x804020100000000L, 0x402010000000000L, 0x201000000000000L, 0x100000000000000L
     };
     
-    public static String possibleWhiteMoves(long WP,long WN,long WB,long WR,long WQ,long WK,long BP,long BN,long BB,long BR,long BQ,long BK, long EP, boolean CWK, boolean CWQ, boolean CBK, boolean CBQ){
-        NOT_MY_PIECES = ~(WP|WN|WB|WR|WQ|WK|BK);
-        MY_PIECES = WP|WN|WB|WR|WQ;
-        OCCUPIED = WP|WN|WB|WR|WQ|WK|BP|BN|BB|BR|BQ|BK;
+    public static String possibleWhiteMoves(Position p){
+        NOT_MY_PIECES = ~(p.WP|p.WN|p.WB|p.WR|p.WQ|p.WK|p.BK);
+        MY_PIECES = p.WP|p.WN|p.WB|p.WR|p.WQ;
+        OCCUPIED = p.WP|p.WN|p.WB|p.WR|p.WQ|p.WK|p.BP|p.BN|p.BB|p.BR|p.BQ|p.BK;
         EMPTY = ~OCCUPIED;
-        StringBuilder list= new StringBuilder(possibleWP(WP, BP, EP)); 
-        list.append(possibleB(WB));
-        list.append(possibleR(WR));
-        list.append(possibleQ(WQ));
-        list.append(possibleN(WN));
-        list.append(possibleK(WK));
-        list.append(possibleCW(WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, CWK, CWQ));
+        StringBuilder list= new StringBuilder(possibleWP(p.WP, p.BP, p.EP)); 
+        list.append(possibleB(p.WB));
+        list.append(possibleR(p.WR));
+        list.append(possibleQ(p.WQ));
+        list.append(possibleN(p.WN));
+        list.append(possibleK(p.WK));
+        list.append(possibleCW(p.WP, p.WN, p.WB, p.WR, p.WQ, p.WK, p.BP, p.BN, p.BB, p.BR, p.BQ, p.BK, p.CWK, p.CWQ));
         
         return list.toString();
     }
 
-    public static String possibleBlackMoves(long WP,long WN,long WB,long WR,long WQ,long WK,long BP,long BN,long BB,long BR,long BQ,long BK, long EP, boolean CWK, boolean CWQ, boolean CBK, boolean CBQ){
-        NOT_MY_PIECES = ~(BP|BN|BB|BR|BQ|WK|BK);
-        MY_PIECES = BP|BN|BB|BR|BQ;
-        OCCUPIED = WP|WN|WB|WR|WQ|WK|BP|BN|BB|BR|BQ|BK;
+    public static String possibleBlackMoves(Position p){
+        NOT_MY_PIECES = ~(p.BP|p.BN|p.BB|p.BR|p.BQ|p.WK|p.BK);
+        MY_PIECES = p.BP|p.BN|p.BB|p.BR|p.BQ;
+        OCCUPIED = p.WP|p.WN|p.WB|p.WR|p.WQ|p.WK|p.BP|p.BN|p.BB|p.BR|p.BQ|p.BK;
         EMPTY = ~OCCUPIED;
-        StringBuilder list= new StringBuilder(possibleBP(BP, WP, EP));
-        list.append(possibleB(BB));
-        list.append(possibleR(BR));
-        list.append(possibleQ(BQ));
-        list.append(possibleN(BN));
-        list.append(possibleK(BK));
-        list.append(possibleCB(WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, CBK, CBQ));        
+        StringBuilder list= new StringBuilder(possibleBP(p.BP, p.WP, p.EP));
+        list.append(possibleB(p.BB));
+        list.append(possibleR(p.BR));
+        list.append(possibleQ(p.BQ));
+        list.append(possibleN(p.BN));
+        list.append(possibleK(p.BK));
+        list.append(possibleCB(p.WP, p.WN, p.WB, p.WR, p.WQ, p.WK, p.BP, p.BN, p.BB, p.BR, p.BQ, p.BK, p.CBK, p.CBQ));        
         
         return list.toString();
     }
@@ -78,123 +78,37 @@ public class Moves {
 
     public static long unsafeForWhite(long WP,long WN,long WB,long WR,long WQ,long WK,long BP,long BN,long BB,long BR,long BQ,long BK){
         OCCUPIED=WP|WN|WB|WR|WQ|WK|BP|BN|BB|BR|BQ|BK;
-        long unsafe=((BP<<7)&~HFILE);
-        unsafe|=((BP<<9)&~AFILE);
-        long possibility;
-        long i=BN&~(BN-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            if (loc>18)
-            {
-                possibility=KNIGHT_SPAN<<(loc-18);
-            }
-            else {
-                possibility=KNIGHT_SPAN>>(18-loc);
-            }
-            if (loc%8<4)
-            {
-                possibility &=~GHFILES;
-            }
-            else {
-                possibility &=~ABFILES;
-            }
-            unsafe |= possibility;
-            BN&=~i;
-            i=BN&~(BN-1);
-        }
+        long unsafe = blackPawnMoves(BP);
 
-        long QB=BQ|BB;
-        i=QB&~(QB-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            possibility=diagonals(loc);
-            unsafe |= possibility;
-            QB&=~i;
-            i=QB&~(QB-1);
-        }
+        unsafe |= knightMoves(BN);
 
-        long QR=BQ|BR;
-        i=QR&~(QR-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            possibility=horizontalAndVertical(loc);
-            unsafe |= possibility;
-            QR&=~i;
-            i=QR&~(QR-1);
-        }
+        unsafe |= queenMoves(BQ);
 
-        int loc=Long.numberOfTrailingZeros(BK);
-        if (loc>9)
-        {
-            possibility=KING_SPAN<<(loc-9);
-        }
-        else {
-            possibility=KING_SPAN>>(9-loc);
-        }
-        if (loc%8<4)
-        {
-            possibility &=~GHFILES;
-        }
-        else {
-            possibility &=~ABFILES;
-        }
-        unsafe |= possibility;
+        unsafe |= rookMoves(BR);
+
+        unsafe |= bishopMoves(BB);
+
+        unsafe |= kingMoves(BK);
         return unsafe;
     }
 
     public static long unsafeForBlack(long WP,long WN,long WB,long WR,long WQ,long WK,long BP,long BN,long BB,long BR,long BQ,long BK){
         OCCUPIED=WP|WN|WB|WR|WQ|WK|BP|BN|BB|BR|BQ|BK;
-        long unsafe=((WP>>>7)&~AFILE);
-        unsafe|=((WP>>>9)&~HFILE);
+        long unsafe = whitePawnMoves(WP);
+        unsafe |= knightMoves(WN);
+
+        unsafe |= queenMoves(WQ);
+
+        unsafe |= rookMoves(WR);
+
+        unsafe |= bishopMoves(WB);
+
+        unsafe |= kingMoves(WK);
+        return unsafe;
+    }
+
+    public static long kingMoves(long WK) {
         long possibility;
-        long i=WN&~(WN-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            if (loc>18)
-            {
-                possibility=KNIGHT_SPAN<<(loc-18);
-            }
-            else {
-                possibility=KNIGHT_SPAN>>(18-loc);
-            }
-            if (loc%8<4)
-            {
-                possibility &=~GHFILES;
-            }
-            else {
-                possibility &=~ABFILES;
-            }
-            unsafe |= possibility;
-            WN&=~i;
-            i=WN&~(WN-1);
-        }
-
-        long QB=WQ|WB;
-        i=QB&~(QB-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            possibility=diagonals(loc);
-            unsafe |= possibility;
-            QB&=~i;
-            i=QB&~(QB-1);
-        }
-
-        long QR=WQ|WR;
-        i=QR&~(QR-1);
-        while(i != 0)
-        {
-            int loc=Long.numberOfTrailingZeros(i);
-            possibility=horizontalAndVertical(loc);
-            unsafe |= possibility;
-            QR&=~i;
-            i=QR&~(QR-1);
-        }
-
         int loc=Long.numberOfTrailingZeros(WK);
         if (loc>9)
         {
@@ -210,7 +124,106 @@ public class Moves {
         else {
             possibility &=~ABFILES;
         }
-        unsafe |= possibility;
+        return possibility;
+    }
+
+    public static long queenMoves(long Q) {
+        long possibility;
+        long straightQ = Q;
+        long i = Q&~(Q-1);
+        long unsafe = 0;
+        while(i != 0)
+        {
+            int loc=Long.numberOfTrailingZeros(i);
+            possibility=diagonals(loc);
+            unsafe |= possibility;
+            Q&=~i;
+            i=Q&~(Q-1);
+        }
+
+        i=straightQ&~(straightQ-1);
+        while(i != 0)
+        {
+            int loc=Long.numberOfTrailingZeros(i);
+            possibility=horizontalAndVertical(loc);
+            unsafe |= possibility;
+            straightQ&=~i;
+            i=straightQ&~(straightQ-1);
+        }
+        return unsafe;
+    }
+
+    public static long bishopMoves(long B){
+        long possibility;
+        long i = B&~(B-1);
+        long unsafe = 0;
+        while(i != 0)
+        {
+            int loc=Long.numberOfTrailingZeros(i);
+            possibility=diagonals(loc);
+            unsafe |= possibility;
+            B&=~i;
+            i=B&~(B-1);
+        }
+        return unsafe;
+    }
+
+    public static long rookMoves(long R){
+        long possibility;
+        long i = R&~(R-1);
+        long unsafe = 0;
+
+        while(i != 0)
+        {
+            int loc=Long.numberOfTrailingZeros(i);
+            possibility=horizontalAndVertical(loc);
+            unsafe |= possibility;
+            R&=~i;
+            i=R&~(R-1);
+        }
+
+        return unsafe;
+    }
+
+    public static long knightMoves(long N) {
+        long possibility;
+        long i=N&~(N-1);
+        long unsafe = 0;
+
+        while(i != 0)
+        {
+            int loc=Long.numberOfTrailingZeros(i);
+            if (loc>18)
+            {
+                possibility=KNIGHT_SPAN<<(loc-18);
+            }
+            else {
+                possibility=KNIGHT_SPAN>>(18-loc);
+            }
+            if (loc%8<4)
+            {
+                possibility &=~GHFILES;
+            }
+            else {
+                possibility &=~ABFILES;
+            }
+            unsafe |= possibility;
+            N&=~i;
+            i=N&~(N-1);
+        }
+        
+        return unsafe;
+    }
+
+    public static long whitePawnMoves(long WP) {
+        long unsafe=((WP>>>7)&~AFILE);
+        unsafe|=((WP>>>9)&~HFILE);
+        return unsafe;
+    }
+
+    public static long blackPawnMoves(long BP) {
+        long unsafe=((BP<<7)&~HFILE);
+        unsafe|=((BP<<9)&~AFILE);
         return unsafe;
     }
 
